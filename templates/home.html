@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="title">
+  {% if lang == "en" %}
+    Have you settled down in the UK yet? Read through this and see if you missed anything!
+  {% elif lang == "cn" %}
+
+  {% endif %}
+</div>
+
+<div class="sections">
+  {% for section in sections %}
+    <div class="section">
+      <div class="section-title">
+        {{ section.title }}
+      </div>
+      {% for link in section.links %}
+        <div class="link" id="link-{{ link.id }}" >
+          <div class="header">
+            <input type="checkbox" class="visited" id="link-{{ link.id }}-checkbox" onchange="syncCheckbox('{{ link.id }}')"></input>
+            <button data-id="{{ link.id }}" class="open-link" onclick="toggleLinkOpen('{{ link.id }}')">{{ link.label |safe }}</button>
+          </div>
+          <div class="footer open" onclick="toggleLinkOpen('{{ link.id }}')">
+            <div class="closed-content">...</div>
+            <div class="open-content">
+              {{ link.content |safe }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <script>
+    document.querySelectorAll(".link .visited").forEach(checkbox => {
+      const id = checkbox.id;
+      const isOpen = localStorage.getItem(id) === "true";
+      checkbox.checked = isOpen;
+    });
+    const toggleLinkOpen = (id) => document.getElementById(`link-${id}`).classList.toggle("open");
+    const syncCheckbox = (id) => {
+      const el = document.getElementById(`link-${id}-checkbox`);
+      if (!el) {
+        return;
+      }
+      console.log(`setting state to: ${el.checked}`);
+      localStorage.setItem(`link-${id}-checkbox`, el.checked ? 'true' : 'false');
+    };
+  </script>
+</div>
+
+{% endblock %}

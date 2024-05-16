@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block head_extensions %}
+<link rel="stylesheet" href="{% static 'screens.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="title">
+  <div></div>
+  <div class="language-selector">
+    <button class="lang {% if lang == 'ch' %}selected{%endif%}" onclick="setLanguage('ch')">中文</button> 
+    <button class="lang {% if lang == 'en' %}selected{%endif%}" onclick="setLanguage('en')">EN</button> 
+  </div>
+</div>
+
+<div class="screens" ontouchstart="swipeStart(event)" ontouchmove="swipeMove(event)">
+  <div class="screen-row" id="screen-row">
+    {% for screen in screens %}
+      <div class="screen {% if forloop.counter < selected_screen %}past{% elif forloop.counter == selected_screen %}present{% else %}future{% endif %}"
+           id="screen-{{ forloop.counter }}"
+           data-index="{{ forloop.counter }}"
+           data-total="{{ screens|length }}">
+        <div class="filler"></div>
+        {% for item in screen.items %}
+          {% if item.item_type == "body" %}
+            <div class="screen-item body">
+              {{ item.body_key|t:lang |safe }}
+            </div>
+          {% elif item.item_type == "image" %}
+            <img class="screen-item image" src="{% static item.image_name %}">
+          {% elif item.item_type == "card" %}
+            <div class="screen-item card">
+              <div class="card-info">
+                <div class="card-text">{{ item.body_key|t:lang |safe }}</div>
+                <div class="card-subtext">
+                  {{ item.quantity }}&nbsp;{{ "questions"|t:lang |safe }}
+                </div>
+              </div>
+              <img class="card-image" src="{% static item.image_name %}">
+            </div>
+          {% endif %}
+        {% endfor %}
+        <div class="filler"></div>
+        <div class="screen-buttons">
+          {% if forloop.counter == screens|length %}
+            <a class="button" href="{{ finish_url }}">
+              <img src="{% static 'imgs/tick.svg' %}">
+            </a>
+          {% else %}
+            <button class="button next" onclick="nextScreen({{ forloop.counter }})">
+              <img src="{% static 'imgs/arrow.svg' %}">
+            </button>
+          {% endif %}
+          <div class="filler"></div>
+          {% if forloop.counter != 1 %}
+            <button class="button previous" onclick="previousScreen({{ forloop.counter }})">
+              <img src="{% static 'imgs/arrow.svg' %}">
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="screen-pegs">
+  {% for screen in screens %}
+    <div class="screen-peg {% if selected_screen == forloop.counter %}selected{% endif %}"
+         id="screen-peg-{{ forloop.counter }}"></div>
+  {% endfor %}
+</div>
+
+<script>
+  const SWIPE_STATE = {
+    x: null, y: null
+  };
+
+  const swipeStart = (e) => {
+    const firstTouch = e.touches[0];
+    if (firstTouch) {
+      SWIPE_STATE.x = firstTouch.clientX;
+      SWIPE_STATE.y = firstTouch.clientY;
+    }
+  };
+
+  const swipeMove = (e) => {
+    if (SWIPE_STATE.x === null || SWIPE_STATE.y === null) {
+      return;
+    }
+
+    const endX = e.touches[0].clientX;
+    const endY = e.touches[0].clientY;
+
+    const dx = SWIPE_STATE.x - endX;
+    const dy = SWIPE_STATE.y - endY;
+    SWIPE_STATE.x = null;
+    SWIPE_STATE.y = null;
+
+    // horizontal swipe
+    if (Math.abs(dx) > Math.abs(dy)) {
+      const presentScreenEl = document.querySelector(".screen.present");
+      if (!presentScreenEl) {
+        return;
+      }
+
+      const total = parseInt(presentScreenEl.dataset.total);
+      const currentIndex = parseInt(presentScreenEl.dataset.index);
+      if (isNaN(currentIndex) || isNaN(total)) {
+        return;
+      }
+
+      if (dx < 0) {
+        if (currentIndex > 1) {
+          previousScreen(currentIndex);
+        }
+      } else if (currentIndex !== total) {
+        nextScreen(currentIndex);
+      }
+    }
+  };
+
+  const updateScreenEls = (nextIndex) => {
+    document.querySelectorAll(".screen-peg").forEach(peg => peg.classList.remove("selected"));
+    const nextScreenPegEl = document.getElementById(`screen-peg-${nextIndex}`);
+    if (nextScreenPegEl) {
+      nextScreenPegEl.classList.add("selected");
+    }
+
+    document.querySelectorAll(".screen").forEach(screen => {
+      const index = parseInt(screen.dataset.index);
+      screen.classList.remove("past", "present", "future");
+      if (isNaN(index) || index < nextIndex) {
+        screen.classList.add("past");
+      } else if (index === nextIndex) {
+        screen.classList.add("present");
+      } else {
+        screen.classList.add("future");
+      }
+    });
+  };
+
+  const setScreen = (nextIndex) => {
+    if (isNaN(nextIndex)) {
+      return;
+    }
+
+    updateScreenEls(nextIndex);
+    if (window.history.pushState) {
+      const newURL = new URL(window.location.href);
+      newURL.searchParams.set("page", nextIndex);
+      window.history.pushState({ path: newURL.href }, '', newURL.href);
+    }
+  };
+  const nextScreen = (currentIndex) => {
+    setScreen(parseInt(currentIndex) + 1);
+  };
+  const previousScreen = (currentIndex) => {
+    setScreen(parseInt(currentIndex) - 1);
+  };
+  window.addEventListener('popstate', (e) => {
+    if (!e.state || !e.state.path) {
+      return;
+    }
+    const newUrl = new URL(e.state.path);
+    const page = parseInt(newUrl.searchParams.get("page"));
+    if (!isNaN(page)) {
+      updateScreenEls(page);
+    }
+  });
+</script>
+
+{% endblock %}

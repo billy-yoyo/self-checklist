@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block head_extensions %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="title">
+  <div></div>
+  <div class="language-selector">
+    <button class="lang {% if lang == 'ch' %}selected{%endif%}" onclick="setLanguage('ch')">中文</button> 
+    <button class="lang {% if lang == 'en' %}selected{%endif%}" onclick="setLanguage('en')">EN</button> 
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">
+    {{ section.title_key|t:lang |safe }}
+  </div>
+  <div class="section-content">
+    {% for item in section.items %}
+      <div class="link" id="link-{{ item.id }}">
+        {% if item.title_key %}
+        <div class="header">
+          {% if item.content.content_type == "list" %}
+            <input type="checkbox" data-option="done" data-survey="{{ item.content.list_name }}">
+          {% endif %}
+          <div data-id="{{ link.id }}" class="open-link">
+            {{ item.title_key|t:lang |safe }}
+          </div>
+        </div>
+        {% endif %}
+        {% if item.content.content_type != "list" or item.content.entries %}
+          <div class="footer {% if not item.title_key %}noheader{%endif%}" id="footer-{{ item.id }}">
+            {% if item.content.content_type == "body" %}
+              {{ item.content.body_key|t:lang |safe }}
+            {% elif item.content.content_type == "list" %}
+              <ul class="list">
+                {% for entry in item.content.entries %}
+                  <li class="list-entry">
+                    <div class="dot"></div>
+                    <div class="body">
+                      {{ entry.body_key|t:lang |safe }}
+                    </div>
+                  </li>
+                {% endfor %}
+                <div class="cover"></div>
+              </ul>
+              <button class="expander" onclick="expandList({{ item.id }})">{{ "click-to-expand"|t:lang }}</button>
+            {% elif item.content.content_type == "survey" %}
+              <div class="survey">
+                {% for option in item.content.options %}
+                  <div class="option">
+                    <input type="checkbox" data-option="{{ option.option_name }}" data-survey="{{ item.content.survey_name }}">
+                    <label>{{ option.option_key|t:lang |safe }}</label>
+                    {% if option.free_text %}
+                      <input type="text"
+                            placeholder="{{ "other"|t:lang }}"
+                            data-option="{{ option.option_name }}"
+                            data-survey="{{ item.content.survey_name }}"
+                            onchange="updateOptionCheckbox('{{ item.content.survey_name }}', '{{ option.option_name }}')"
+                            onkeydown="updateOptionCheckbox('{{ item.content.survey_name }}', '{{ option.option_name }}')">
+                    {% endif %}
+                  </div>
+                {% endfor %}
+                <button class="survey-submit {% if item.content.completed %}hidden{% endif %}"
+                        id="survey-{{ item.content.survey_name }}-submit"
+                        onclick="Survey.submit('{{ item.content.survey_name }}')">
+                  {{ "submit"|t:lang }}
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+      
+      {% if item.content.content_type == "survey" %}
+        <div class="followup {% if not item.content.completed %}hidden{% endif %}" id="survey-followup-{{ item.content.survey_name }}">
+          <div class="results">
+            <div class="pie-chart">
+              <canvas id="pie-chart-{{ item.content.survey_name }}" width="300" height="300"></canvas>
+            </div>
+          </div>
+
+          {% for followup in item.content.followups %}
+            <div class="followup-item {%if not followup.visible %}hidden{% endif %} with-p"
+                data-survey="{{ item.content.survey_name }}"
+                data-answers="{{ followup.answers }}">
+              {{ followup.body_key|t:lang |safe }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="section-buttons">
+    <a class="finish" href="{{ finish_url }}" onclick="markFinished('{{ checklist_name }}', '{{ section.section_name }}')">{{ "finish"|t:lang }}</a>
+  </div>
+</div>
+
+{{ pie_data|json_script:"pie_data" }}
+
+<script src="{% static 'surveys.js' %}"></script>
+<script>
+  document.querySelectorAll(".link .visited").forEach(checkbox => {
+    const id = checkbox.id;
+    const isChecked = localStorage.getItem(id) === "true";
+    checkbox.checked = isChecked;
+  });
+  const syncCheckbox = (id) => {
+    const el = document.getElementById(`link-${id}-checkbox`);
+    if (!el) {
+      return;
+    }
+    console.log(`setting state to: ${el.checked}`);
+    localStorage.setItem(`link-${id}-checkbox`, el.checked ? 'true' : 'false');
+  };
+  const updateOptionCheckbox = (surveyName, optionName) => {
+    const checkbox = document.querySelector(`input[type=checkbox][data-option="${optionName}"][data-survey="${surveyName}"]`);
+    const textbox = document.querySelector(`input[type=text][data-option="${optionName}"][data-survey="${surveyName}"]`);
+
+    if (textbox && textbox.value && textbox.value.trim() !== "") {
+      checkbox.checked = true;
+    }
+  };
+  const markFinished = (checklistName, sectionName) => {
+    localStorage.setItem(`checklist/${checklistName}/${sectionName}`, "finished");
+  };
+  const expandList = (itemId) => {
+    const footer = document.getElementById(`footer-${itemId}`);
+    if (footer) {
+      footer.classList.add("expanded");
+    }
+  };
+
+  (() => {
+    Chart.defaults.color = "#fff";
+    const pieData = JSON.parse(document.getElementById("pie_data").textContent);
+    Object.entries(pieData).forEach(([surveyName, surveyData]) => {
+      new Chart(document.getElementById(`pie-chart-${surveyName}`), {
+        type: "bar",
+        data: surveyData,
+        options: {
+          borderColor: 'transparent',
+          indexAxis: 'y',
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          maintainAspectRatio: false
+        }
+      });
+    });
+    
+  })();
+</script>
+
+{% endblock %}
