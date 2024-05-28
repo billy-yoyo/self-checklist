@@ -15,8 +15,11 @@
     <button class="lang {% if lang == 'en' %}selected{%endif%}" onclick="setLanguage('en')">EN</button> 
   </div>
 </div>
-
+<div class="top-image">
+  <img src="{% static checklist.progression.top_image_name %}">
+</div>
 <div class="progression-wrapper">
+
   <div class="progression">
     {% for step in checklist.progression.steps %}
       <a class="progression-step {% if step.finished %}finished{% endif %}"

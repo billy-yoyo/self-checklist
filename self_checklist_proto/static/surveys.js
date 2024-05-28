@@ -16,6 +16,19 @@ const Survey = (() => {
     }
   });
 
+  const countSurveyOptions = (surveyName, excludedOptions) => {
+    const resultJson = localStorage.getItem(`survey-result-${surveyName}`);
+    if (!resultJson) {
+      return 0;
+    }
+
+    const result = JSON.parse(resultJson);
+    return Object.entries(result)
+      .filter(([key, value]) => !excludedOptions.includes(key))
+      .filter(([key, value]) => value)
+      .length;
+  };
+
   const postSubmit = async (surveyName, answers) => {
     console.log(`submitting ${surveyName} with answers ${JSON.stringify(answers)}`);
     const response = await fetch(`/survey/${surveyName}`, {
@@ -90,7 +103,7 @@ const Survey = (() => {
 
     followups.forEach(followup => {
       const validAnswers = followup.dataset.answers.split(";");
-      if (validAnswers.some(answer => answers[answer])) {
+      if (followup.dataset.answers === "" || validAnswers.some(answer => answers[answer])) {
         followup.classList.remove("hidden");
       } else {
         followup.classList.add("hidden");
@@ -109,6 +122,7 @@ const Survey = (() => {
   };
 
   return {
-    submit: submitSurvey
+    submit: submitSurvey,
+    count: countSurveyOptions
   }
 })();

@@ -45,12 +45,12 @@ p {
   margin: 12px 0;
 }
 
-a:visited {
-  color: var(--colour-primary-darker-2);
+a {
+  color: var(--colour-primary-darker);
 }
 
-a {
-  color: var(--colour-secondary);
+a:visited {
+  color: var(--colour-primary-darker-2);
 }
 
 .main-wrapper {
@@ -67,6 +67,7 @@ a {
 }
 
 main {
+  position: relative;
   width: min(100vw, 800px);
   padding: 1rem;
   box-sizing: border-box;
@@ -112,6 +113,12 @@ div.language-selector button.selected {
   color: var(--colour-white);
 }
 
+
+@media (max-width:641px) { 
+  div.language-selector button {
+    padding: 0.25rem 0.5rem;
+  }
+}
 
 .subtitle {
   font-size: 1rem;
@@ -349,6 +356,10 @@ ul {
   flex-direction: column;
 }
 
+.survey .survey-subtitle {
+  margin-bottom: 1rem;
+}
+
 .survey .option {
   display: flex;
   flex-direction: row;
@@ -494,10 +505,6 @@ input[type=checkbox]:checked {
   padding: 0.5rem;
 }
 
-.hidden {
-  display: none;
-}
-
 .checklist-title {
   font-weight: bold;
   margin-top: 2rem;
@@ -638,4 +645,84 @@ input[type=checkbox]:checked {
   .list {
     margin-left: 0;
   }
+
+  .progression-step .progression-text {
+    font-size: 0.75rem;
+  }
 }
+
+.top-image {
+  position: absolute;
+  top: 2.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-image img {
+  width: 100px;
+}
+
+@media (max-width:641px) { 
+  .top-image img {
+    width: 60px;
+  }
+}
+
+.suggestions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  
+  border-radius: 10px;
+  background-color: var(--colour-primary);
+  margin-bottom: 1rem;
+  box-shadow: 5px 5px 0px var(--colour-black);
+
+  box-sizing: border-box;
+  padding: 1rem 2rem;
+  overflow: hidden;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background-color: var(--colour-primary-lighter);
+  margin-right: 5px;
+}
+
+.result-buttons {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.result-button {
+  flex: 1;
+  background-color: var(--colour-primary-lighter);
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  color: var(--colour-white);
+  text-wrap: nowrap;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px var(--colour-black);
+  text-decoration: none;
+  margin: 0.25rem;
+}
+
+.hidden {
+  display: none;
+}
+
+

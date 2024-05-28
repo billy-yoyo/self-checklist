@@ -21,7 +21,6 @@
     const setLanguage = (lang) => {
       const newURL = new URL(window.location.href);
       newURL.searchParams.set("lang", lang);
-      console.log(newURL);
       window.location.assign(newURL.href);
     };
   </script>

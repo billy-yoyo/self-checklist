@@ -26,7 +26,10 @@
         {% if item.title_key %}
         <div class="header">
           {% if item.content.content_type == "list" %}
-            <input type="checkbox" data-option="done" data-survey="{{ item.content.list_name }}">
+            <input id="checkbox-list-{{ item.content.list_name }}"
+                   type="checkbox"
+                   data-option="{{ item.content.list_name }}"
+                   data-survey="{{ section.section_name }}">
           {% endif %}
           <div data-id="{{ link.id }}" class="open-link">
             {{ item.title_key|t:lang |safe }}
@@ -52,6 +55,11 @@
               <button class="expander" onclick="expandList({{ item.id }})">{{ "click-to-expand"|t:lang }}</button>
             {% elif item.content.content_type == "survey" %}
               <div class="survey">
+                {% if item.content.subtitle %}
+                <div class="survey-subtitle with-p">
+                  {{ item.content.subtitle|t:lang |safe }}
+                </div>
+                {% endif %}
                 {% for option in item.content.options %}
                   <div class="option">
                     <input type="checkbox" data-option="{{ option.option_name }}" data-survey="{{ item.content.survey_name }}">
@@ -79,11 +87,13 @@
       
       {% if item.content.content_type == "survey" %}
         <div class="followup {% if not item.content.completed %}hidden{% endif %}" id="survey-followup-{{ item.content.survey_name }}">
+          {% if not item.content.hide_graph %}
           <div class="results">
             <div class="pie-chart">
               <canvas id="pie-chart-{{ item.content.survey_name }}" width="300" height="300"></canvas>
             </div>
           </div>
+          {% endif %}
 
           {% for followup in item.content.followups %}
             <div class="followup-item {%if not followup.visible %}hidden{% endif %} with-p"
@@ -98,7 +108,7 @@
   </div>
 
   <div class="section-buttons">
-    <a class="finish" href="{{ finish_url }}" onclick="markFinished('{{ checklist_name }}', '{{ section.section_name }}')">{{ "finish"|t:lang }}</a>
+    <a class="finish" href="{{ finish_url }}" onclick="markFinished()">{{ "finish"|t:lang }}</a>
   </div>
 </div>
 
@@ -106,19 +116,9 @@
 
 <script src="{% static 'surveys.js' %}"></script>
 <script>
-  document.querySelectorAll(".link .visited").forEach(checkbox => {
-    const id = checkbox.id;
-    const isChecked = localStorage.getItem(id) === "true";
-    checkbox.checked = isChecked;
-  });
-  const syncCheckbox = (id) => {
-    const el = document.getElementById(`link-${id}-checkbox`);
-    if (!el) {
-      return;
-    }
-    console.log(`setting state to: ${el.checked}`);
-    localStorage.setItem(`link-${id}-checkbox`, el.checked ? 'true' : 'false');
-  };
+  const CHECKLIST_NAME = "{{ checklist_name }}";
+  const SECTION_NAME = "{{ section.section_name }}";
+  
   const updateOptionCheckbox = (surveyName, optionName) => {
     const checkbox = document.querySelector(`input[type=checkbox][data-option="${optionName}"][data-survey="${surveyName}"]`);
     const textbox = document.querySelector(`input[type=text][data-option="${optionName}"][data-survey="${surveyName}"]`);
@@ -127,8 +127,9 @@
       checkbox.checked = true;
     }
   };
-  const markFinished = (checklistName, sectionName) => {
-    localStorage.setItem(`checklist/${checklistName}/${sectionName}`, "finished");
+  const markFinished = () => {
+    Survey.submit(SECTION_NAME);
+    localStorage.setItem(`checklist/${CHECKLIST_NAME}/${SECTION_NAME}`, "finished");
   };
   const expandList = (itemId) => {
     const footer = document.getElementById(`footer-${itemId}`);

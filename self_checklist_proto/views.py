@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
 import markdown
 import self_checklist_proto.templatetags
-from .content import checklists, screen_sets
+from .content import checklists, screen_sets, ResultsSection
 import json
 from .models import *
+from .language import translator
 
 
 def int_or_else(x, or_else):
@@ -51,20 +52,41 @@ def checklist_section(request, checklist_name=None, section_name=None):
 
   lang = get_lang(request)
   section = sections[0]
-  section = section.populate(request.user)
+  section = section.populate(request.user, checklist)
+  
+  pie_data = {}
+  summary_data = {}
 
-  surveys = [item.content for item in section.items if item.content.content_type == "survey"]
-  pie_data = {
-    survey.survey_name: survey.get_data(lang) for survey in surveys
-  }
+  if isinstance(section, ResultsSection):
+    summary_data = {
+      summary.survey_name: summary.get_data(lang) for summary in section.summaries
+    }
+    pie_data = {
+      "global": {
+        "labels": [translator.t(summary.title_key, lang) for summary in section.summaries],
+        "datasets": [{
+          "data": [summary.global_level for summary in section.summaries],
+          "backgroundColor": "#A06CD588",
+          "borderColor": "#A06CD5"
+        }]
+      }
+    }
+  else:
+    surveys = [item.content for item in section.items if item.content.content_type == "survey"]
+    pie_data = {
+      survey.survey_name: survey.get_data(lang) for survey in surveys
+    }
 
-  return render(request, "section.html", {
+  template = "results.html" if isinstance(section, ResultsSection) else "section.html"
+
+  return render(request, template, {
     "section": section,
     "lang": lang,
     "qlang": request.GET.get("lang"),
     "checklist_name": checklist_name,
     "finish_url": f"/checklist/{checklist_name}",
-    "pie_data": pie_data
+    "pie_data": pie_data,
+    "summary_data": summary_data
   })
 
 def render_screen(request, name):
@@ -104,6 +126,9 @@ def submit_survey(request, name=None):
     if "answers" not in json_data:
       return HttpResponseBadRequest()
 
+    submission = SurveySubmission(survey=survey)
+    submission.save()
+
     for option_name, selected in json_data["answers"].items():
       option = SurveyOption.objects.filter(survey=survey, name=option_name).first()
       if not option:
@@ -111,7 +136,7 @@ def submit_survey(request, name=None):
         option.save()
 
       if selected:
-        result = SurveyResult(option=option)
+        result = SurveyResult(option=option, submission=submission)
         result.save()
       
     return HttpResponse(status=204)

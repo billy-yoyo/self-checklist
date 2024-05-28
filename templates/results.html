@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block head_extensions %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="title">
+  <div>{{ section.personal_results_key|t:lang |safe }}</div>
+  <div class="language-selector">
+    <button class="lang {% if lang == 'ch' %}selected{%endif%}" onclick="setLanguage('ch')">中文</button> 
+    <button class="lang {% if lang == 'en' %}selected{%endif%}" onclick="setLanguage('en')">EN</button> 
+  </div>
+</div>
+
+<div class="result-shape">
+  <canvas id="my-results" width="300" height="400"></canvas>
+</div>
+
+<div class="suggestions">
+  {% for summary in section.summaries %}
+    {% for message_key in summary.level_message_keys %}
+      <div class="suggestion hidden" id="suggestion-{{ summary.survey_name }}-{{ forloop.counter0  }}">
+        {{ message_key|t:lang |safe }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+<div class="title">{{ section.global_results_key|t:lang |safe }}</div>
+
+<div class="subtitle">{{ section.pattern_key|t:lang |safe }}</div>
+
+<div class="result-shape">
+  <canvas id="global-results" width="500" height="400"></canvas>
+</div>
+
+<div class="subtitle">{{ section.complete_key|t:lang |safe }}</div>
+
+<ul class="completed">
+  {% for complete in section.complete %}
+    <li>{{ complete|t:lang |safe }}</li>
+  {% endfor %}
+</ul>
+
+<div class="subtitle">{{ section.uncomplete_key|t:lang |safe }}</div>
+
+<ul class="completed">
+  {% for uncomplete in section.uncomplete %}
+    <li>{{ uncomplete|t:lang |safe }}</li>
+  {% endfor %}
+</ul>
+
+<div class="result-buttons">
+  <button class="result-button">{{ "save"|t:lang }}</button>
+  <button class="result-button">{{ "share"|t:lang }}</button>
+  <button class="result-button">{{ "invite"|t:lang }}</button>
+  <button class="result-button">{{ "download"|t:lang }}</button>
+</div>
+
+{{ pie_data|json_script:"pie_data" }}
+{{ summary_data|json_script:"summary_data" }}
+
+<script src="{% static 'surveys.js' %}"></script>
+<script>
+  const CHECKLIST_NAME = "{{ checklist_name }}";
+
+
+  (() => {
+    const radarOptions = {
+      scales: {
+        r: {
+          beginAtZero: true,
+          min: 0,
+          max: 3,
+          stepSize: 1,
+          ticks: {
+            display: false,
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+    };
+
+    const pieData = JSON.parse(document.getElementById("pie_data").textContent);
+    const globalData = pieData["global"];
+    new Chart('global-results', {
+      type: 'radar',
+      data: globalData,
+      options: radarOptions
+    })
+
+    const summaryData = JSON.parse(document.getElementById("summary_data").textContent);
+    const labels = [];
+    const dataset = [];
+    Object.entries(summaryData).forEach(([surveyName, summary]) => {
+      const count = Survey.count(surveyName, summary.excluded);
+      let level = 0;
+      for (let threshold of summary.thresholds) {
+        if (count < threshold) {
+          break;
+        }
+        level += 1;
+      }
+
+      labels.push(summary.title);
+      dataset.push(level);
+
+      const suggestion = document.getElementById(`suggestion-${surveyName}-${level}`);
+      if (suggestion) {
+        suggestion.classList.remove('hidden');
+      }
+    });
+
+    new Chart('my-results', {
+      type: 'radar',
+      data: {
+        labels,
+        datasets: [{
+          data: dataset,
+          backgroundColor: '#A06CD588',
+          borderColor: '#A06CD5'
+        }]
+      },
+      options: radarOptions
+    })
+  })();
+</script>
+
+{% endblock %}

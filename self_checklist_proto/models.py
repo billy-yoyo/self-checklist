@@ -22,7 +22,11 @@ class SurveyOption(models.Model):
   def __str__(self) -> str:
     return f"{self.survey}/{self.name}"
 
+class SurveySubmission(models.Model):
+  survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+
 class SurveyResult(models.Model):
+  submission = models.ForeignKey(SurveySubmission, on_delete=models.CASCADE)
   option = models.ForeignKey(SurveyOption, on_delete=models.CASCADE)
   
   def __str__(self) -> str:
