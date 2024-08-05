@@ -18,7 +18,7 @@ server {
 
     # Django static
     location /static/ {
-        root /var/www/personal_website;
+        root /var/www/self_checklist_proto;
     }
 
     location / {
