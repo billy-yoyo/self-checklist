@@ -560,7 +560,7 @@ input[type=checkbox]:checked {
 @media (max-width:641px) { 
   .progression-wrapper.simple .progression {
     flex-direction: column;
-    padding-bottom: none;
+    padding-bottom: 0;
   }
 
   .progression-wrapper.simple .progression-step {
