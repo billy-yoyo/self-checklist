@@ -182,7 +182,6 @@ self_progress = Checklist(
             [
               ContentListEntry("self-progress/arriving-uk/get-accommodation/1"),
               ContentListEntry("self-progress/arriving-uk/get-accommodation/2"),
-              ContentListEntry("self-progress/arriving-uk/get-accommodation/3"),
               ContentListEntry("self-progress/arriving-uk/get-accommodation/4"),
               ContentListEntry("self-progress/arriving-uk/get-accommodation/5"),
               ContentListEntry("self-progress/arriving-uk/get-accommodation/6"),

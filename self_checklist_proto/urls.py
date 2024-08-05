@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('checklist/<slug:name>', views.checklist),
     path('checklist/<slug:checklist_name>/<slug:section_name>', views.checklist_section),
-    path('', views.introduction),
+    path('', views.simple_checklist), # TODO: remove simple
+    # path('', views.introduction),
     path('survey/<slug:name>', views.submit_survey),
 ]

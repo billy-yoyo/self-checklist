@@ -9,6 +9,12 @@ $$:raw click-to-expand
 $ en
 Click here to read more
 
+$$:raw restart
+$ en
+Restart
+$ ch
+重置
+
 $ ch
 更多详情
 
@@ -160,19 +166,19 @@ $ en
 Current Emotions
 
 $ ch
-现在的心情
+心理压力测评
 
 $$ studying
 $ en
 Arrival Checklist
 $ ch
-快速安顿
+如何快速安顿
 
 $$ living
 $ en
 Study Preparations
 $ ch
-学习准备
+学习准备事项
 
 $$ total-questions
 $ en
@@ -216,19 +222,19 @@ $$$ self-progress
 
 $$ title
 $ en
-Adaptation Progress self-checklist 
+Adaptation guidance and services recommendation for international students - Just Arrived period
 
 $ ch
-适应程度自查表
+国际学生的文化适应指导与服务建议 - 刚刚抵达阶段
 
 $$$ self-progress/psych-adaptation
 
 $$ title
 $ en
-Let's see how you're feeling now, before we start.
+Let's see how you're feeling now. You can see the votes from other stduents, relevant suggestions and service recommend.
 
 $ ch
-在正式开始之前，先来看看你目前的心情吧
+先来看看你目前的压力状况吧！在结果页面，你能看到其他同学的投票，以及相关的建议和服务推荐。
 
 
 $$ arrive-feeling
@@ -398,19 +404,15 @@ It's time to start living alone
 in the UK, come and see if
 you're ready!
 
-Tick the
-information you already
-know and the unchecked
-information will
-automatically generate a to-do list for you to download.
+All options below developed from
+graduate international stduents' suggestions
+for this adaptation stage.
 
 $ ch
 要在英国开始独自生活了，快来
 看看你准备好了吗！
 
-勾选你已经
-知道的信息，未被勾选的信息会
-自动生成待做清单以供下载。
+以下选项均来自于往届国际生的对于本适应阶段的建议。
 
 $$ get-brp
 $ en
@@ -806,7 +808,7 @@ $ en
 $$ find-people/4
 $ ch
 **Social event** - 整个学年都会定期举办不同的social event, 例如周边城市旅行, 展览，咖啡闲聊， 电影之夜，和创意集市等等! 这
-是一个结交朋友，或者与新认识的朋友社交的绝佳机会。点击[Goldsmiths学校官网]https://www.gold.ac.uk/events/)查看
+是一个结交朋友，或者与新认识的朋友社交的绝佳机会。点击[Goldsmiths学校官网](https://www.gold.ac.uk/events/)查看
 更多的活动信息，并点击预约吧！或者点击[DMU学校官网](https://www.dmu.ac.uk/current-students/student-support/international/explore-uk.aspx)，查看预定你感兴趣的城市去旅行吧！
 
 $ en
@@ -824,7 +826,7 @@ $ ch
 $ en
 **Student Societies** - We have over 70 different school clubs,
 covering different sports and interests, as well as some cultural societies! Click on the
-[Goldmsiths official website](https://www.goldsmithssu.org/opportunities/find_a_society/) to browse the societies
+[Goldsmiths学校官网](https://www.goldsmithssu.org/opportunities/find_a_society/) to browse the societies
 and community activities you are interested in, and click to join!
 
 $$ explore-city
@@ -884,13 +886,13 @@ $ ch
 $$$ self-progress/study-life
 $$ title
 $ ch
-马上要开始硕士学习了，来看看你做好准
-备了吗！勾选你已经知道的信息，未被勾
-选的信息会自动生成待做清单以供下载。
+马上要开始硕士学习了，来看看你做好准备了吗！
+以下选项均来自于往届国际生的对于本适应阶段的建议
 
 $ en
-You're about to start your master's degree, are you ready? Check the information you already know or leave it unchecked.
-The selected information will automatically generate a to-do list for download.
+You're about to start your master's degree, are you ready? 
+All options below developed from graduate international stduents' suggestions
+for this adaptation stage.
 
 $$ explore-uni
 $ ch
@@ -1098,12 +1100,13 @@ $$:raw solo-study/1/option/8
 $ en
 Find and understand the assessement criteria.
 $ ch
+查找并理解作业打分标准。
 
 $$:raw solo-study/1/option/9
 $ en
 Choose the courses I'm interesting based on my goals.
 $ ch
-查找并理解作业打分标准。
+选择自己感兴趣的选修课。
 
 $$:raw solo-study/1/option/10
 $ en

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="title">
+  <div></div>
+  <div class="language-selector">
+    <button class="lang {% if lang == 'ch' %}selected{%endif%}" onclick="setLanguage('ch')">中文</button> 
+    <button class="lang {% if lang == 'en' %}selected{%endif%}" onclick="setLanguage('en')">EN</button> 
+  </div>
+</div>
+<div class="title checklist">
+  {{ checklist.title_key|t:lang |safe }}
+</div>
+<div class="progression-wrapper simple">
+  <div class="progression">
+    {% for step in checklist.progression.steps %}
+      <a class="progression-step {% if step.finished %}finished{% endif %}"
+        {% if step.linked_section %}
+          href={{ "/checklist/"|add:checklist_name|add:"/"|add:step.linked_section|withlang:qlang }}
+          data-section="{{ step.linked_section }}"
+        {% endif %}>
+        
+        <div class="progression-text">
+          {{ step.title_key|t:lang }}
+        </div>
+        <img class="step" src="{% static step.image_name %}">
+        <img class="step finished" src="{% static step.finished_image_name %}">
+        
+        <img class="tick" src="{% static 'imgs/tick-filled.svg' %}">
+
+        <img class="star" src="{% static 'imgs/star.svg' %}">
+        <img class="star second" src="{% static 'imgs/star-2.svg' %}">
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="checklist-buttons">
+  <button class="button restart" onclick="restart()">
+    {{ "restart"|t:lang }}
+  </button>
+</div>
+
+<script>
+  const CHECKLIST_NAME = "{{ checklist_name }}";
+  (() => {
+    const STATE = { foundFirst: false };
+    document.querySelectorAll(".progression-step").forEach(step => {
+      const sectionName = step.dataset.section;
+      if (!sectionName) {
+        return;
+      }
+
+      const sectionState = localStorage.getItem(`checklist/${CHECKLIST_NAME}/${sectionName}`);
+      if (sectionState === "finished") {
+        step.classList.add("finished");
+      }
+
+      if (!STATE.foundFirst && !step.classList.contains("finished")) {
+        // step.classList.add("next");
+        STATE.foundFirst = true;
+      }
+    });
+  })();
+  const restart = () => {
+    localStorage.clear();
+    location.reload();
+  };
+  Footsteps.load();
+</script>
+
+{% endblock %}

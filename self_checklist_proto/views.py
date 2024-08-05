@@ -41,6 +41,19 @@ def checklist(request, name=None):
   else:
     return HttpResponseNotFound()
 
+def simple_checklist(request):
+  name = "self-progress"
+  checklist = checklists[name]
+  lang = get_lang(request)
+  checklist = checklist.populate(request.user)
+  checklist.progression.steps = checklist.progression.steps[1:-1]
+  return render(request, "simple_checklist.html", {
+    "checklist": checklist,
+    "lang": lang,
+    "qlang": request.GET.get("lang"),
+    "checklist_name": name
+  })
+
 def checklist_section(request, checklist_name=None, section_name=None):
   if checklist_name not in checklists:
     return HttpResponseNotFound()
@@ -84,7 +97,8 @@ def checklist_section(request, checklist_name=None, section_name=None):
     "lang": lang,
     "qlang": request.GET.get("lang"),
     "checklist_name": checklist_name,
-    "finish_url": f"/checklist/{checklist_name}",
+    #"finish_url": f"/checklist/{checklist_name}",
+    "finish_url": f"/", # TODO: remove simple
     "pie_data": pie_data,
     "summary_data": summary_data
   })

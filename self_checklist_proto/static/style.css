@@ -80,6 +80,11 @@ main {
   flex-direction: row;
 }
 
+.title.checklist {
+  text-align: center;
+  margin-top: 1rem;
+}
+
 .title div {
   flex: 1;
 }
@@ -91,7 +96,8 @@ div.language-selector {
   flex-direction: row;
   border-radius: 5px;
   overflow: hidden;
-
+  height: 3rem;
+  margin-left: 2rem;
 }
 
 div.language-selector button {
@@ -516,7 +522,6 @@ input[type=checkbox]:checked {
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 
 .progression {
@@ -525,6 +530,12 @@ input[type=checkbox]:checked {
   align-items: flex-start;
   margin-top: 3rem;
   width: 550px;
+}
+
+.progression-wrapper.simple .progression {
+  flex-direction: row;
+  width: unset;
+  margin-top: 5rem;
 }
 
 .progression-step {
@@ -539,6 +550,20 @@ input[type=checkbox]:checked {
 
 .progression-step:nth-child(2n) {
   align-self: flex-end;
+}
+
+.progression-wrapper.simple .progression-step {
+  align-self: unset;
+}
+
+@media (max-width:641px) { 
+  .progression-wrapper.simple .progression {
+    flex-direction: column;
+  }
+
+  .progression-wrapper.simple .progression-step {
+    margin-bottom: 5rem;
+  }
 }
 
 .progression-step img.step {
@@ -707,6 +732,30 @@ input[type=checkbox]:checked {
 
 .result-button {
   flex: 1;
+  background-color: var(--colour-primary-lighter);
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  color: var(--colour-white);
+  text-wrap: nowrap;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px var(--colour-black);
+  text-decoration: none;
+  margin: 0.25rem;
+}
+
+.checklist-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.restart {
+  align-self: center;
   background-color: var(--colour-primary-lighter);
   border: none;
   border-radius: 5px;
