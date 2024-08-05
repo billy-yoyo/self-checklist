@@ -9,14 +9,14 @@ $$:raw click-to-expand
 $ en
 Click here to read more
 
+$ ch
+更多详情
+
 $$:raw restart
 $ en
 Restart
 $ ch
 重置
-
-$ ch
-更多详情
 
 $$:raw save
 $ en
